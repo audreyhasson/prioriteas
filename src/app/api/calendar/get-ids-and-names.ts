@@ -5,16 +5,25 @@ export async function getIdsAndNames(accessToken: string) {
   const res: Array<{ summary: string; id: string }> = [];
 
   for (let i = 0; i < ids.length; i++) {
-    const { summary, id } = await fetch(
-      `https://www.googleapis.com/calendar/v3/users/me/calendarList/${ids[i]}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + accessToken,
-        },
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/calendar/v3/users/me/calendarList/${ids[i]}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+        }
+      );
+      const data = await response.json();
+
+      // Only add to results if both summary and id are defined
+      if (data.summary && data.id) {
+        res.push({ summary: data.summary, id: data.id });
       }
-    ).then((res) => res.json());
-    res.push({ summary, id });
+    } catch (error) {
+      console.error(`Error fetching calendar ${ids[i]}:`, error);
+    }
   }
 
   return res;
