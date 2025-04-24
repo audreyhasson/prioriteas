@@ -43,6 +43,7 @@ export function makeSchedule(
   // Sort free blocks by duration
   freeBlocks.sort(compareBlockDuration);
   // Sort high priority tasks first by if they have a pref then duration (asc)
+  // Edit: Even higher priority is unbreakable tasks
   //   const sortedHighTasks = sortByPrefThenDuration(highPriorityTasks);
   highPriorityTasks.sort(comparePrefThenDuration);
 
@@ -151,6 +152,12 @@ function scheduleTask(task: Task, freeBlocks: Block[]) {
     task,
     "totalDuration"
   );
+  if (blockIdxs.length > 1 && task.unbreakable) {
+    // We already searched for the least num of blocks that would fit
+    // and there had to be more than one
+    // So we can't schedule this task, throw err
+    throw new Error("Can't schedule unbreakable task with just one block");
+  }
   const scheduledTaskChunks = [];
   // Otherwise we found multiple blocks we want to insert our task into
   // We should remove that block from freeBlocks, chop out the time we need,
@@ -225,6 +232,13 @@ function scheduleTaskWithPref(
     pref
   );
   if (!blockIdxs) return null;
+  if (blockIdxs.length > 1 && task.unbreakable) {
+    // We already searched for the least num of pref blocks that would fit
+    // and there had to be more than one
+    // So we can't schedule this task with pref, but maybe I can without pref
+    return null;
+  }
+
   blockIdxs.sort();
 
   // Take out the blocks i want and add them to their own list
@@ -458,7 +472,11 @@ function compareBlockDuration(block1: Block, block2: Block) {
 }
 
 function comparePrefThenDuration(task1: Task, task2: Task) {
-  if (task1.pref && task2.pref) return task1.minutes - task2.minutes;
+  // Unbreakable takes priority over breakable
+  // Then pref takes priority over non-pref
+  // Then higher duration takes priority over lower duration
+  if (task1.unbreakable && !task2.unbreakable) return 1;
+  if (!task1.unbreakable && task2.unbreakable) return -1;
   if (task1.pref && !task2.pref) return 1;
   if (task2.pref && !task1.pref) return -1;
   return task1.minutes - task2.minutes;
@@ -531,18 +549,18 @@ export function getTimeBetweenISO(start: string, end: string) {
 
 /** TESTING */
 // @ts-ignore
-const plHw = new Task("312 homework", 120, "am");
+const plHw = new Task("312 homework", 120, false, "am");
 const grading = new Task("grade resubs", 30);
 // @ts-ignore
-const journal = new Task("journal", 15, "pm");
+const journal = new Task("journal", 15, false, "pm");
 const bmeQuiz = new Task("bme quiz :(", 120);
 
 const testHighTasks = [plHw, grading, journal, bmeQuiz];
 
 const goGym = new Task("go to gym", 120);
 const seeKev = new Task("see kev", 30);
-const rockClimb = new Task("Rock climbing", 120, "pm");
-const dinnerWithGirls = new Task("women in din", 120, "eve");
+const rockClimb = new Task("Rock climbing", 120, false, "pm");
+const dinnerWithGirls = new Task("women in din", 120, false, "eve");
 
 const testLowTasks = [goGym, seeKev, rockClimb, dinnerWithGirls];
 

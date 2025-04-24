@@ -80,3 +80,13 @@ body {
 input:not(:focus)::placeholder {
   visibility: hidden;
 }
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  /* background: none; */
+  /* display: none; */
+  margin-right: -0.5rem;
+}
+
+input[type="time"] {
+  overflow: visible;
+}
