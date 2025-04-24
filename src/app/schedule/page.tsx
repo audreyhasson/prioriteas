@@ -268,6 +268,31 @@ export default function Schedule() {
                         <p>Start: {item.start}</p>
                         <p>End: {item.end}</p>
                     </div>)} */}
+                      <div className="flex justify-between items-center mb-2">
+                        <button
+                          className="px-3 py-1 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 flex items-center"
+                          onClick={() => {
+                            setCalendarSubmit(false);
+                            setSchedule(null);
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 19l-7-7 7-7"
+                            />
+                          </svg>
+                          Back to calendars
+                        </button>
+                      </div>
                       <CalendarView
                         events={schedule}
                         tasks={[]}
@@ -278,16 +303,39 @@ export default function Schedule() {
                     </div>
                   ) : (
                     <>
-                      <p>Cool, you submitted something</p>
-                      {events &&
-                        events.map((item, idx) => (
-                          <div key={idx}>
-                            <p>Event: {item.name}</p>
-                            <p>
-                              Time: {item.start} to {item.end}
-                            </p>
-                          </div>
-                        ))}
+                      <div className="flex justify-between items-center mb-4">
+                        <button
+                          className="px-3 py-1 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 flex items-center"
+                          onClick={() => setCalendarSubmit(false)}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 19l-7-7 7-7"
+                            />
+                          </svg>
+                          Back to calendars
+                        </button>
+                      </div>
+                      <div className="p-2">
+                        {events &&
+                          events.map((item, idx) => (
+                            <div key={idx} className="mb-2 p-2 border rounded">
+                              <p className="font-medium">{item.name}</p>
+                              <p>
+                                Time: {item.start} to {item.end}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
                     </>
                   )
                 ) : (
