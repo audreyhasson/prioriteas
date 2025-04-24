@@ -1,12 +1,13 @@
 export class Task {
   name: string;
   minutes: number;
+  unbreakable: boolean;
   pref: string | null;
-  constructor(name: string, minutes: number, pref = null) {
+  constructor(name: string, minutes: number, unbreakable = false, pref = null) {
     this.name = name;
     this.minutes = minutes;
+    this.unbreakable = unbreakable;
     this.pref = pref;
-    // this.getTimeText = this.getTimeText.bind(this);
   }
 
   getTimeText() {

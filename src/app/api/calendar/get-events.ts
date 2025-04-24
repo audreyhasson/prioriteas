@@ -56,7 +56,6 @@ function parseForTimeAndName(calItems) {
     );
     if (Date.parse(start.dateTime) < timeMinD.getTime()) {
       console.log(start.dateTime, "is too early");
-
       start.dateTime = timeZero.toISOString();
       console.log("new", start.dateTime);
     }

@@ -11,7 +11,7 @@ import SignOut from "@/components/sign-out.tsx";
 import { getEvents } from "../api/calendar/get-events.ts";
 import { compareISOTime, makeSchedule } from "@/app/scheduler/makeSchedule.ts"
 import CalendarView from "@/components/calendar-view-v2.tsx";
-
+import PreferencesDialog from "@/components/preferences-dialog.tsx";
 
 export default function Schedule() {
 
@@ -65,6 +65,7 @@ export default function Schedule() {
         // Should be in form name / time / pref, send error otherwise
         // Times could be in many forms
         const tagList = rawText.split("/")
+        const unbreakable = rawText.includes("*")
         if (tagList.length < 2) {
             setSyntaxError("Need to include a name and a time estimate, separated by a slash, with every task")
             return null;
@@ -73,7 +74,7 @@ export default function Schedule() {
         const timeText = tagList[1].trim();
         const minutes = getMinutesFromRawText(timeText);
         if (!minutes) {
-            setSyntaxError("The time expression doesn't include numbers")
+            setSyntaxError("The time expression doesn't include numbers, or it doesn't include an h or m")
             return null;
         }
         let pref = null;
@@ -92,7 +93,7 @@ export default function Schedule() {
         }
         setSyntaxError("")
         // @ts-ignore
-        return new Task(name, minutes, pref);
+        return new Task(name, minutes, unbreakable, pref);
     }
 
     function getMinutesFromRawText(timeText : string) {
@@ -141,6 +142,7 @@ export default function Schedule() {
         <div className="flex h-[100vh] gap-x-5 p-8">
             <div className="w-2/3 gap-y-5 flex flex-col h-full">
                 <p>Prioriteas</p>
+                <PreferencesDialog />
                 {syntaxError != "" &&  <p>Typing issue: {syntaxError}</p>}
                 <div className="outline rounded-md h-1/2" onClick={() => highInputRef.current.focus()}> 
                     <p>Need to do</p>
@@ -230,6 +232,7 @@ function getListElementFromTask(task : Task, id : number, taskList : Task[], set
                     <p>{task.name}</p>
                 <Badge>{task.getTimeText()}</Badge>
                 {task.pref && <Badge className="button">pref {task.pref}</Badge>}
+                {task.unbreakable && <Badge className="button">do not split</Badge>}
         </div>
         <button className="hidden group-hover:block" onClick={() => deleteTask(id)}>delete</button>
     </div>
