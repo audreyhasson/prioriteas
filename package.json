@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
+    "@supabase/ssr": "github:supabase/ssr",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "fs": "^0.0.1-security",
