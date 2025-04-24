@@ -24,8 +24,8 @@ export default function Schedule() {
   const [schedule, setSchedule] = useState<null | Array<
     CalendarEvent | ScheduledTask
   >>(null);
-  const highInputRef = useRef();
-  const lowInputRef = useRef();
+  const highInputRef = useRef<HTMLInputElement>(null);
+  const lowInputRef = useRef<HTMLInputElement>(null);
 
   const { data: session, status } = useSession();
   const {
@@ -53,6 +53,15 @@ export default function Schedule() {
   }
 
   async function handleCalendarSubmit() {
+    // Check if any calendars are selected
+    if (selectedCals.length === 0) {
+      setSyntaxError("Please select at least one calendar to continue.");
+      return;
+    }
+
+    // Clear any previous error
+    setSyntaxError("");
+
     // pass in selected Ids to get events api function
     if (session && session.accessToken) {
       const caughtEvents = await getEvents(session.accessToken, selectedCals);
@@ -161,16 +170,22 @@ export default function Schedule() {
 
   return (
     <>
-      <div className="flex h-[100vh] gap-x-5 p-8">
+      <div className="flex h-screen max-h-screen overflow-hidden gap-x-5 p-8">
         <div className="w-2/3 gap-y-5 flex flex-col h-full">
           <p>Prioriteas</p>
-          {syntaxError != "" && <p>Typing issue: {syntaxError}</p>}
+          <div className="h-6">
+            {" "}
+            {/* Adjust height as needed */}
+            {syntaxError && (
+              <p className="text-red-500 text-sm">{syntaxError}</p>
+            )}
+          </div>
           <div
-            className="outline rounded-md h-1/2"
-            onClick={() => highInputRef.current.focus()}
+            className="outline rounded-md flex flex-col h-[45%] min-h-0"
+            onClick={() => highInputRef.current?.focus()}
           >
-            <p>Need to do</p>
-            <div className="pl-5">
+            <p className="p-2 border-b font-medium">Need to do</p>
+            <div className="flex-1 overflow-y-auto pl-5 pr-2">
               {highPriorityTasks.map((task, id) =>
                 getListElementFromTask(
                   task,
@@ -194,12 +209,13 @@ export default function Schedule() {
               </form>
             </div>
           </div>
+
           <div
-            className="outline rounded-md h-1/2"
-            onClick={() => lowInputRef.current.focus()}
+            className="outline rounded-md flex flex-col h-[45%] min-h-0"
+            onClick={() => lowInputRef.current?.focus()}
           >
-            <p>Want to do</p>
-            <div className="pl-5">
+            <p className="p-2 border-b font-medium">Want to do</p>
+            <div className="flex-1 overflow-y-auto pl-5 pr-2">
               {lowPriorityTasks.map((task, id) =>
                 getListElementFromTask(
                   task,
@@ -224,7 +240,7 @@ export default function Schedule() {
             </div>
           </div>
         </div>
-        <div className="outline rounded-md h-full overflow-y-auto w-[70%]">
+        <div className="outline rounded-md h-full overflow-y-auto w-[70%] flex-1">
           <div>
             {status == "loading" ||
             isLoading ||
