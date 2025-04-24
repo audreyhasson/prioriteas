@@ -14,6 +14,24 @@ import CalendarView from "@/components/calendar-view-v2.tsx";
 import PreferencesDialog from "@/components/preferences-dialog.tsx";
 // Correct the import path for useToast
 import { useToast } from "@/hooks/use-toast"; // Corrected import path
+import { cn } from "@/lib/utils"; // Import cn utility if not already present
+
+// Define color constants (or move these to tailwind.config.js)
+const colors = {
+  pageBg: "bg-gray-50",
+  mainBorder: "border-blue-300",
+  panelLight: "bg-[#EED9C5]",
+  panelDark: "bg-[#DCB8AC]",
+  accent: "bg-[#6D4C41]", // Dark Brown
+  accentText: "text-[#6D4C41]",
+  accentBorder: "border-[#6D4C41]",
+  bobaBg: "bg-[#D9E8E8]", // Light Blue-Grey
+  bobaPearl: "bg-[#402C23]", // Darker Brown for pearls
+  panelBorder: "border-[#C6B8A9]", // Subtle border for inside panels
+  textLight: "text-white",
+  textDark: "text-gray-800", // Default dark text
+  textMuted: "text-gray-500",
+};
 
 export default function Schedule() {
   const [highPriorityTasks, setHighPriorityTasks] = useState<Task[]>([]);
@@ -347,12 +365,33 @@ export default function Schedule() {
     }
   }
 
-  // Define common button styles
-  const baseButtonStyle = "px-3 py-1 rounded-md w-full text-sm text-center"; // Added text-center
-  const enabledButtonStyle = `${baseButtonStyle} bg-blue-500 text-white hover:bg-blue-600`;
-  const disabledButtonStyle = `${baseButtonStyle} bg-gray-300 text-gray-500 cursor-not-allowed`;
-  const outlineButtonStyle = `${baseButtonStyle} border border-blue-500 text-blue-500 hover:bg-blue-50`; // Example outline style
-  const placeholderButtonStyle = `${baseButtonStyle} bg-gray-400 text-white cursor-not-allowed`; // Adjusted placeholder style
+  // Define common button styles using color constants and increased rounding
+  const baseButtonStyle =
+    "px-4 py-2 rounded-lg w-full text-sm text-center shadow-sm"; // Increased padding/rounding, added shadow
+  const enabledButtonStyle = cn(
+    baseButtonStyle,
+    colors.accent,
+    colors.textLight,
+    `hover:${colors.accent}/90`
+  ); // Use cn for combining
+  const disabledButtonStyle = cn(
+    baseButtonStyle,
+    "bg-gray-300",
+    colors.textMuted,
+    "cursor-not-allowed"
+  );
+  const outlineButtonStyle = cn(
+    baseButtonStyle,
+    colors.accentBorder,
+    colors.accentText,
+    "border hover:bg-opacity-10 hover:bg-black"
+  ); // Use accent colors
+  const placeholderButtonStyle = cn(
+    baseButtonStyle,
+    "bg-gray-400",
+    colors.textLight,
+    "cursor-not-allowed"
+  ); // Keep placeholder distinct
 
   // Determine if the main content area should be rendered
   const canDisplayContent =
@@ -365,287 +404,376 @@ export default function Schedule() {
 
   return (
     <>
-      {/* Reminder: Ensure <Toaster /> is included in your main layout file (e.g., app/layout.tsx) */}
-      <div className="flex h-screen max-h-screen overflow-hidden gap-x-5 p-8">
-        {/* Left Panel */}
-        <div className="w-2/3 gap-y-5 flex flex-col h-full">
-          <p className="text-3xl font-semibold py-3">Prioriteas</p>{" "}
-          {/* Need to do Panel */}
-          <div
-            className="outline outline-1 outline-gray-300 rounded-md flex flex-col h-[45%] min-h-0" // Adjusted outline color
-            onClick={() => highInputRef.current?.focus()}
-          >
-            <p className="p-2 border-b border-gray-300 font-medium">
-              Need to do
+      {/* Reminder: Ensure <Toaster /> is included ... */}
+      {/* Apply page background */}
+      <div
+        className={cn(
+          "flex h-screen max-h-screen overflow-hidden p-8",
+          colors.pageBg
+        )}
+      >
+        {/* Main container with border and increased rounding */}
+        <div className={"flex flex-grow gap-x-5 rounded-2xl p-6"}>
+          {/* Left Panel */}
+          <div className="w-2/3 gap-y-5 flex flex-col h-full">
+            <p className="text-3xl font-semibold py-3 text-gray-800">
+              Prioriteas
             </p>{" "}
-            {/* Adjusted border color */}
-            <div className="flex-1 overflow-y-auto pl-5 pr-2">
-              {highPriorityTasks.map((task, id) =>
-                getListElementFromTask(
-                  task,
-                  id,
-                  highPriorityTasks,
-                  setHighPriorityTasks
-                )
-              )}
-              <form
-                className="w-full"
-                onSubmit={(e) =>
-                  addTask(e, highPriorityTasks, setHighPriorityTasks)
-                }
-              >
-                <input
-                  ref={highInputRef}
-                  type="text"
-                  placeholder="Task / Time / Pref (e.g., Work / 2h / am)" // More descriptive placeholder
-                  className="w-full focus:outline-none p-1 bg-transparent" // Basic input styling
-                ></input>
-              </form>
-            </div>
-          </div>
-          {/* Lower Left Section */}
-          <div className="flex h-[45%] min-h-0 gap-x-4">
-            {/* Want to do Panel */}
+            {/* Adjusted text color */}
+            {/* Need to do Panel */}
             <div
-              className="outline outline-1 outline-gray-300 rounded-md flex flex-col w-3/4 h-full" // Adjusted outline color
-              onClick={() => lowInputRef.current?.focus()}
+              className={cn(
+                "relative flex flex-col h-[45%] min-h-0 rounded-xl shadow-md overflow-hidden", // Added shadow, overflow-hidden
+                colors.panelLight // Apply panel background
+              )}
+              onClick={() => highInputRef.current?.focus()}
             >
-              <p className="p-2 border-b border-gray-300 font-medium">
-                Want to do
+              {/* Boba Pearls Graphic */}
+              <div className="absolute bottom-3 left-3 flex gap-1">
+                <div
+                  className={cn("w-2 h-2 rounded-full", colors.bobaPearl)}
+                ></div>
+                <div
+                  className={cn("w-3 h-3 rounded-full", colors.bobaPearl)}
+                ></div>
+                <div
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full mt-1",
+                    colors.bobaPearl
+                  )}
+                ></div>
+              </div>
+              <p
+                className={cn(
+                  "p-3 font-medium",
+                  colors.panelBorder,
+                  colors.textDark
+                )}
+              >
+                {" "}
+                {/* Adjusted padding/border/text */}
+                Need to do
               </p>{" "}
-              {/* Adjusted border color */}
-              <div className="flex-1 overflow-y-auto pl-5 pr-2">
-                {lowPriorityTasks.map((task, id) =>
+              <div className="flex-1 overflow-y-auto pl-5 pr-2 pt-2">
+                {" "}
+                {/* Added pt-2 */}
+                {highPriorityTasks.map((task, id) =>
                   getListElementFromTask(
                     task,
                     id,
-                    lowPriorityTasks,
-                    setLowPriorityTasks
+                    highPriorityTasks,
+                    setHighPriorityTasks
                   )
                 )}
                 <form
                   className="w-full"
                   onSubmit={(e) =>
-                    addTask(e, lowPriorityTasks, setLowPriorityTasks)
+                    addTask(e, highPriorityTasks, setHighPriorityTasks)
                   }
                 >
                   <input
-                    ref={lowInputRef}
+                    ref={highInputRef}
                     type="text"
-                    placeholder="Fun task / 1h 30m / eve" // Example placeholder
-                    className="w-full focus:outline-none p-1 bg-transparent" // Basic input styling
+                    placeholder="Task / Time / Pref (e.g., Work / 2h / am)"
+                    className="w-full focus:outline-none p-1 bg-transparent text-sm" // Ensure bg is transparent
                   ></input>
                 </form>
               </div>
             </div>
-
-            {/* Buttons and Image Area */}
-            <div className="w-1/4 flex flex-col gap-y-2 h-full">
-              {/* Buttons Container */}
-              <div className="flex flex-col gap-y-2 w-full">
-                {/* Button 1: Preferences */}
-                <PreferencesDialog>
-                  <button type="button" className={outlineButtonStyle}>
-                    {" "}
-                    {/* Apply your custom style */}
-                    Set Preferences
-                  </button>
-                </PreferencesDialog>
-
-                {/* Button 2: Regenerate Schedule */}
-                <button
-                  type="button" // Good practice to specify type
-                  onClick={generateSchedule} // Regenerate uses toast for errors now
-                  // Disable if schedule not generated yet OR if initial data isn't ready
-                  disabled={!schedule || !canDisplayContent}
-                  className={
-                    !schedule || !canDisplayContent
-                      ? disabledButtonStyle
-                      : enabledButtonStyle
-                  } // Apply custom styles
+            {/* Lower Left Section */}
+            <div className="flex h-[45%] min-h-0 gap-x-4">
+              {/* Want to do Panel */}
+              <div
+                className={cn(
+                  "relative flex flex-col w-3/4 h-full rounded-xl shadow-md overflow-hidden", // Added shadow, overflow-hidden
+                  colors.panelLight // Apply panel background
+                )}
+                onClick={() => lowInputRef.current?.focus()}
+              >
+                {/* Boba Pearls Graphic */}
+                <div className="absolute bottom-3 left-3 flex gap-1">
+                  <div
+                    className={cn("w-2 h-2 rounded-full", colors.bobaPearl)}
+                  ></div>
+                  <div
+                    className={cn("w-3 h-3 rounded-full", colors.bobaPearl)}
+                  ></div>
+                  <div
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full mt-1",
+                      colors.bobaPearl
+                    )}
+                  ></div>
+                </div>
+                <p
+                  className={cn(
+                    "p-3 font-medium",
+                    colors.panelBorder,
+                    colors.textDark
+                  )}
                 >
-                  Regenerate Schedule {/* Updated text */}
-                </button>
-
-                {/* Button 3: Redeem Boba (Placeholder) */}
-                <button
-                  type="button"
-                  disabled
-                  className={placeholderButtonStyle} // Apply custom styles
-                >
-                  Redeem Boba
-                </button>
+                  {" "}
+                  {/* Adjusted padding/border/text */}
+                  Want to do
+                </p>{" "}
+                <div className="flex-1 overflow-y-auto pl-5 pr-2 pt-2">
+                  {" "}
+                  {/* Added pt-2 */}
+                  {lowPriorityTasks.map((task, id) =>
+                    getListElementFromTask(
+                      task,
+                      id,
+                      lowPriorityTasks,
+                      setLowPriorityTasks
+                    )
+                  )}
+                  <form
+                    className="w-full"
+                    onSubmit={(e) =>
+                      addTask(e, lowPriorityTasks, setLowPriorityTasks)
+                    }
+                  >
+                    <input
+                      ref={lowInputRef}
+                      type="text"
+                      placeholder="Fun task / 1h 30m / eve"
+                      className="w-full focus:outline-none p-1 bg-transparent text-sm" // Ensure bg is transparent
+                    ></input>
+                  </form>
+                </div>
               </div>
 
-              {/* Image Placeholder (Takes remaining space) */}
-              <div className="w-full flex-grow bg-gray-200 rounded-md flex items-center justify-center text-gray-500 mt-2">
-                {" "}
-                {/* Added mt-2 for spacing */}
-                Image Area
+              {/* Buttons and Image Area */}
+              <div className="w-1/4 flex flex-col gap-y-2 h-full">
+                {/* Buttons Container */}
+                <div className="flex flex-col gap-y-2 w-full">
+                  {/* Button 1: Preferences */}
+                  <PreferencesDialog>
+                    <button type="button" className={outlineButtonStyle}>
+                      Set Preferences
+                    </button>
+                  </PreferencesDialog>
+
+                  {/* Button 2: Make Schedule */}
+                  <button
+                    type="button"
+                    onClick={generateSchedule}
+                    disabled={!schedule || !canDisplayContent}
+                    className={
+                      !schedule || !canDisplayContent
+                        ? disabledButtonStyle
+                        : enabledButtonStyle // Use accent color button style
+                    }
+                  >
+                    Make Schedule
+                  </button>
+                </div>
+
+                {/* Image Placeholder (Boba) */}
+                <div
+                  className={cn(
+                    "w-full flex-grow rounded-xl flex items-center justify-center text-gray-500 mt-2 shadow-md", // Added shadow
+                    colors.bobaBg // Apply boba background color
+                  )}
+                >
+                  <p>Image Placeholder</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Right Panel */}
-        <div className="outline outline-1 outline-gray-300 rounded-md h-full overflow-y-auto w-[70%] flex-1 p-4">
-          {" "}
-          {/* Added padding, adjusted outline */}
-          <div>
-            {/* Conditional Rendering based on states */}
-            {showLoadingPlaceholder && (
-              <p className="text-gray-500 text-center p-4">Loading...</p> // Simple loading indicator
+          {/* Right Panel */}
+          <div
+            className={cn(
+              "h-full overflow-y-auto w-[70%] flex-1 p-4 rounded-xl shadow-md", // Added shadow
+              colors.panelDark // Apply panel background
             )}
-            {showAuthError && (
-              <div className="text-center p-4">
-                <p className="text-red-600 mb-2">Authentication required.</p>
-                {/* Optionally add Sign In button here if not handled globally */}
-              </div>
-            )}
-            {showSwrError && (
-              <div className="text-center p-4">
-                <p className="text-red-600 mb-2">
-                  Error loading calendar data.
+          >
+            <div>
+              {/* Conditional Rendering based on states */}
+              {showLoadingPlaceholder && (
+                <p className={cn("text-center p-4", colors.textMuted)}>
+                  Loading...
                 </p>
-                <SignOut /> {/* Provide sign out option */}
-              </div>
-            )}
-            {/* Only render the main content if authenticated, loaded, and calendars exist */}
-            {canDisplayContent && calendars && (
-              // Content Area: Calendar Selection or Schedule View
-              <div>
-                {schedule ? ( // If schedule exists, show it
-                  // Schedule View
-                  <div className="flex flex-col gap-y-1">
-                    <div className="flex justify-start items-center mb-2">
-                      {" "}
-                      {/* Changed justify-between to justify-start */}
-                      <button
-                        className="px-3 py-1 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 flex items-center text-sm" // Adjusted style
-                        onClick={() => {
-                          // Go back to calendar selection view
-                          setSchedule(null);
-                          setCalendarSubmit(false); // Reset this so useEffect doesn't auto-trigger again
-                          setEvents([]); // Clear events
-                          // Keep selectedCals as they are unless user explicitly changes them
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 19l-7-7 7-7"
-                          />
-                        </svg>
-                        Select Calendars {/* Changed text */}
-                      </button>
-                    </div>
-                    <CalendarView
-                      events={schedule}
-                      tasks={[]} // Tasks are already in the schedule array
-                      start="07:00"
-                      end="22:00"
-                      height={90} // Adjust height as needed
-                    />
-                  </div>
-                ) : (
-                  // Otherwise, show Calendar Selection View
-                  <>
-                    <p className="mb-2 text-sm text-gray-700">
-                      {" "}
-                      {/* Adjusted text style */}
-                      Select the calendars to include events from:
-                    </p>
-                    {/* Selected Badges */}
-                    <div className="flex flex-wrap gap-2 my-2 min-h-[2rem]">
-                      {selectedCalNames.length > 0 ? (
-                        selectedCalNames.map((name, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs" // Adjusted style
-                          >
-                            <span>{name}</span>
-                            <button
-                              className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none"
-                              onClick={() =>
-                                updateSelectedCals(selectedCals[idx], name)
-                              }
-                              aria-label={`Remove ${name}`}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-3 w-3"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={3}
-                              >
-                                {" "}
-                                {/* Adjusted stroke width */}
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500 text-sm italic">
-                          No calendars selected
-                        </p>
-                      )}
-                    </div>
-                    {/* Calendar List */}
-                    <div className="flex flex-col border border-gray-300 rounded max-h-60 overflow-y-auto mb-4">
-                      {" "}
-                      {/* Adjusted border */}
-                      {calendars.map((item, idx) => (
+              )}
+              {showAuthError && (
+                <div className="text-center p-4">
+                  <p className="text-red-600 mb-2">Authentication required.</p>
+                </div>
+              )}
+              {showSwrError && (
+                <div className="text-center p-4">
+                  <p className="text-red-600 mb-2">
+                    Error loading calendar data.
+                  </p>
+                  <SignOut />
+                </div>
+              )}
+              {/* Main content */}
+              {canDisplayContent && calendars && (
+                <div>
+                  {schedule ? (
+                    // Schedule View
+                    <div className="flex flex-col gap-y-1">
+                      <div className="flex justify-start items-center mb-4 gap-2">
+                        {" "}
+                        {/* Increased mb */}
                         <button
-                          key={item.id || idx} // Use item.id as key if available
-                          className={`text-left text-sm py-1 px-2 border-b border-gray-200 last:border-b-0 hover:bg-gray-100 ${
-                            // Adjusted styles
-                            selectedCals.includes(item.id)
-                              ? "bg-blue-50 font-medium text-blue-700" // Style for selected
-                              : "text-gray-800"
-                          }`}
-                          onClick={() =>
-                            updateSelectedCals(item.id, item.summary)
-                          }
+                          className="p-2 bg-white/50 text-gray-800 rounded-lg hover:bg-white/70 flex items-center text-sm shadow-sm" // Adjusted style
+                          onClick={() => {
+                            setSchedule(null);
+                            setCalendarSubmit(false);
+                            setEvents([]);
+                          }}
                         >
-                          {item.summary}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            {" "}
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 19l-7-7 7-7"
+                            />{" "}
+                          </svg>
                         </button>
-                      ))}
+                        <p
+                          className={cn(
+                            "text-3xl font-semibold",
+                            colors.textDark
+                          )}
+                        >
+                          Plan
+                        </p>{" "}
+                        {/* Adjusted size/color */}
+                      </div>
+                      <CalendarView
+                        events={schedule}
+                        tasks={[]}
+                        start="07:00"
+                        end="22:00"
+                        height={90}
+                        // Pass colors to CalendarView if it accepts them, otherwise style internally
+                        // Example: eventBgColor={colors.panelLight} hourColor={colors.textDark}
+                      />
                     </div>
-                    {/* Get Events & Generate Schedule Button */}
-                    <button
-                      onClick={handleCalendarSubmit} // This now triggers fetch AND generate (via useEffect)
-                      disabled={selectedCals.length === 0}
-                      className={
-                        selectedCals.length === 0
-                          ? disabledButtonStyle
-                          : enabledButtonStyle
-                      }
-                    >
-                      Get Events & Make Schedule {/* Updated text */}
-                    </button>
-                    {/* Removed the conditional text about 'Ready to Make Schedule' as it happens automatically */}
-                  </>
-                )}
-              </div>
-            )}{" "}
-            {/* End canDisplayContent check */}
-          </div>
-        </div>
-      </div>
+                  ) : (
+                    // Calendar Selection View
+                    <>
+                      <p className={cn("mb-2 text-sm", colors.textDark)}>
+                        {" "}
+                        {/* Adjusted color */}
+                        Select the calendars to include events from:
+                      </p>
+                      {/* Selected Badges */}
+                      <div className="flex flex-wrap gap-2 my-2 min-h-[2rem]">
+                        {selectedCalNames.length > 0 ? (
+                          selectedCalNames.map((name, idx) => (
+                            <div
+                              key={idx}
+                              // Use accent color for selected badges
+                              className={cn(
+                                "flex items-center px-2.5 py-1 rounded-full text-xs shadow-sm",
+                                colors.accent,
+                                colors.textLight
+                              )}
+                            >
+                              <span>{name}</span>
+                              <button
+                                className={cn(
+                                  "ml-1.5 opacity-70 hover:opacity-100 focus:outline-none",
+                                  colors.textLight
+                                )}
+                                onClick={() =>
+                                  updateSelectedCals(selectedCals[idx], name)
+                                }
+                                aria-label={`Remove ${name}`}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-3 w-3"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={3}
+                                >
+                                  {" "}
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />{" "}
+                                </svg>
+                              </button>
+                            </div>
+                          ))
+                        ) : (
+                          <p
+                            className={cn(
+                              "italic",
+                              colors.textMuted,
+                              "text-sm"
+                            )}
+                          >
+                            No calendars selected
+                          </p>
+                        )}
+                      </div>
+                      {/* Calendar List */}
+                      <div
+                        className={cn(
+                          "flex flex-col border rounded-lg max-h-60 overflow-y-auto mb-4 bg-white/30 shadow-sm",
+                          colors.panelBorder
+                        )}
+                      >
+                        {" "}
+                        {/* Adjusted border/bg */}
+                        {calendars.map((item, idx) => (
+                          <button
+                            key={item.id || idx}
+                            className={cn(
+                              "text-left text-sm py-1.5 px-3 border-b last:border-b-0 hover:bg-black/5", // Adjusted padding/hover
+                              colors.panelBorder, // Use subtle border
+                              selectedCals.includes(item.id)
+                                ? cn("font-medium", colors.accentText) // Style for selected
+                                : colors.textDark
+                            )}
+                            onClick={() =>
+                              updateSelectedCals(item.id, item.summary)
+                            }
+                          >
+                            {item.summary}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Get Events & Generate Schedule Button */}
+                      <button
+                        onClick={handleCalendarSubmit}
+                        disabled={selectedCals.length === 0}
+                        className={
+                          selectedCals.length === 0
+                            ? disabledButtonStyle
+                            : enabledButtonStyle // Use accent color button style
+                        }
+                      >
+                        Get Events & Make Schedule
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}{" "}
+              {/* End canDisplayContent check */}
+            </div>
+          </div>{" "}
+          {/* End Right Panel */}
+        </div>{" "}
+        {/* End Main Container */}
+      </div>{" "}
+      {/* End Page Container */}
     </>
   );
 }
@@ -657,61 +785,65 @@ function getListElementFromTask(
   setTaskList: React.Dispatch<React.SetStateAction<Task[]>>
 ) {
   function deleteTask(idToDelete: number) {
-    // Use different name to avoid shadowing
-    // Filter out the task with the matching id
     const updatedList = taskList.filter((_, index) => index !== idToDelete);
     setTaskList(updatedList);
-    // Optionally regenerate schedule if it exists?
-    // setSchedule(null); // Or trigger regeneration
   }
 
   return (
     <div
-      className="group flex justify-between items-center my-1 hover:bg-gray-100 p-1 rounded-sm" // Adjusted hover bg
+      className="group flex justify-between items-center my-1 hover:bg-black/5 p-1 rounded-md" // Subtle hover, rounded-md
       key={id}
     >
       <div className="flex items-center gap-x-2 flex-wrap mr-2">
-        {" "}
-        {/* Added mr-2 for spacing */}
-        <p className="text-sm">{task.name}</p>{" "}
-        {/* Ensure consistent text size */}
-        <Badge variant="secondary" className="text-xs">
+        <p className={cn("text-sm", colors.textDark)}>{task.name}</p>
+        <Badge
+          variant="secondary"
+          className="text-xs bg-black/10 text-gray-700 border-none"
+        >
+          {" "}
+          {/* Adjusted badge style */}
           {task.getTimeText()}
-        </Badge>{" "}
-        {/* Use secondary variant, smaller text */}
+        </Badge>
         {task.pref && (
-          <Badge variant="outline" className="text-xs">
+          <Badge
+            variant="outline"
+            className={cn("text-xs", colors.accentBorder, colors.accentText)}
+          >
+            {" "}
+            {/* Accent outline badge */}
             pref {task.pref}
           </Badge>
-        )}{" "}
-        {/* Outline variant, smaller text */}
+        )}
         {task.unbreakable && (
-          <Badge variant="outline" className="text-xs">
+          <Badge
+            variant="outline"
+            className={cn("text-xs", colors.accentBorder, colors.accentText)}
+          >
+            {" "}
+            {/* Accent outline badge */}
             no split
           </Badge>
-        )}{" "}
-        {/* Outline variant, smaller text */}
+        )}
       </div>
-      {/* Replace text with SVG icon */}
       <button
-        className="hidden group-hover:flex items-center justify-center text-red-500 hover:text-red-700 px-1 focus:outline-none" // Use flex for centering SVG, remove text-xs
+        className="hidden group-hover:flex items-center justify-center text-red-500 hover:text-red-700 p-0.5 rounded-full focus:outline-none focus:bg-red-100" // Adjusted padding/focus
         onClick={() => deleteTask(id)}
         aria-label={`Delete task ${task.name}`}
       >
-        {/* Simple SVG X icon */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4" // Adjust size as needed
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth={2} // Adjust stroke width as needed
+          strokeWidth={2}
         >
+          {" "}
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             d="M6 18L18 6M6 6l12 12"
-          />
+          />{" "}
         </svg>
       </button>
     </div>
